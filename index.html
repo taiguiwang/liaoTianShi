@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* div {
+            width: 300px;
+            height: 200px;
+            border: 1px solid black;
+        } */
+    </style>
+</head>
+
+<body>
+    <!-- 输入内容！ -->
+    <input type="text" placeholder="输入内容！">
+
+    <!-- 发送请求 -->
+    <button>发送请求</button>
+
+    <!-- 显示结果 -->
+    <div></div>
+</body>
+<script>
+    let input = document.querySelector('input');
+    let button = document.querySelector('button');
+    let div = document.querySelector('div');
+
+    const TYPE_ENTER = 0
+    const TYPE_LEAVE = 1
+    const TYPE_MSG = 2
+
+    //创建websocket     参数1：websocket的服务地址
+    var socket = new WebSocket('ws://localhost:3000');
+
+    socket.addEventListener('open', function() {
+        div.innerHTML = '连接成功！';
+    })
+
+    button.addEventListener('click', function() {
+        let value = input.value;
+        socket.send(value);
+        input.value = '';
+
+    })
+
+    socket.addEventListener("message", function(e) {
+        var data = JSON.parse(e.data);
+        var dv = document.createElement('div');
+        dv.innerHTML = data.msg + '------' + data.time;
+        if (data.type === TYPE_ENTER) {
+            dv.style.color = 'green';
+        } else if (data.type === TYPE_LEAVE) {
+            dv.style.color = 'red';
+        } else {
+            dv.style.color = 'blue';
+        }
+
+        div.appendChild(dv);
+
+    })
+
+    socket.addEventListener('close', function() {
+        div.innerHTML = '服务断开'
+    })
+</script>
+
+</html>
